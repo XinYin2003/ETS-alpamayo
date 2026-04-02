@@ -17,6 +17,8 @@
 # This script loads a dataset, runs inference, and computes the minADE.
 # It can be used to test the inference pipeline.
 
+from pathlib import Path
+
 import torch
 import numpy as np
 
@@ -25,15 +27,31 @@ from alpamayo_r1.load_physical_aiavdataset import load_physical_aiavdataset
 from alpamayo_r1 import helper
 
 
+MODEL_DOWNLOAD_DIR = Path("/mnt/disk_new/yx/model")
+MODEL_DOWNLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+
 # Example clip ID
-clip_id = "030c760c-ae38-49aa-9ad8-f5650a545d26"
+# clip_id = "030c760c-ae38-49aa-9ad8-f5650a545d26"
+clip_id = "0a948f59-0a06-41a2-8e20-ac3a39ff4d61"
 print(f"Loading dataset for clip_id: {clip_id}...")
-data = load_physical_aiavdataset(clip_id, t0_us=5_100_000)
+data = load_physical_aiavdataset(clip_id, t0_us=5_100_000)    #包含image_frames、ego_history_xyz、ego_history_rot、ego_future_xyz
 print("Dataset loaded.")
 messages = helper.create_message(data["image_frames"].flatten(0, 1))
 
-model = AlpamayoR1.from_pretrained("nvidia/Alpamayo-R1-10B", dtype=torch.bfloat16).to("cuda")
-processor = helper.get_processor(model.tokenizer)
+model = AlpamayoR1.from_pretrained(
+    # "nvidia/Alpamayo-R1-10B",
+    "/mnt/disk_new/yx/model/nv-community/Alpamayo-R1-10B",
+    dtype=torch.bfloat16,
+    # cache_dir=str(MODEL_DOWNLOAD_DIR),
+).to("cuda")
+
+# import os
+# model_path = os.path.expanduser("~/alpamayo_models/Alpamayo-R1-10B")
+# model = AlpamayoR1.from_pretrained(model_path, dtype=torch.bfloat16).to("cuda")
+
+
+processor = helper.get_processor(model.tokenizer, cache_dir=str(MODEL_DOWNLOAD_DIR))#修改：改变模型的缓存目录
 
 inputs = processor.apply_chat_template(
     messages,

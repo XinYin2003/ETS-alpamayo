@@ -88,7 +88,7 @@ class AlpamayoR1(ReasoningVLA):
         expert_config = copy.deepcopy(self.vlm.config.text_config)
         if config.expert_cfg is not None:
             for key, value in config.expert_cfg.items():
-                setattr(expert_config, key, value)
+                setattr(expert_config, key, value)   #这里将VLA的config替换一部分VLM的
         self.expert = AutoModel.from_config(expert_config)
         # we don't need the embed_tokens of the expert model
         del self.expert.embed_tokens

@@ -13,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from transformers import AutoProcessor, AutoTokenizer
-
 from typing import Any
+
+from transformers import AutoProcessor, AutoTokenizer
 
 import torch
 import collections.abc
@@ -27,6 +27,7 @@ BASE_PROCESSOR_NAME = "Qwen/Qwen3-VL-2B-Instruct"
 
 def create_message(frames: torch.Tensor):
     """Construct the message using images and cot."""
+    """"这里的是固定的信息模板"""
     if frames.ndim != 4:
         raise ValueError(f"{frames.ndim=}, expected 4 (N, C, H, W)")
 
@@ -68,12 +69,17 @@ def create_message(frames: torch.Tensor):
     ]
 
 
-def get_processor(tokenizer: AutoTokenizer) -> AutoProcessor:
+def get_processor(
+    tokenizer: AutoTokenizer,
+    cache_dir: str | None = None,
+) -> AutoProcessor:
     """Get the processor for the Qwen3-VL-2B-Instruct model."""
     processor_kwargs = {
         "min_pixels": MIN_PIXELS,
         "max_pixels": MAX_PIXELS,
     }
+    if cache_dir is not None:
+        processor_kwargs["cache_dir"] = cache_dir
 
     processor = AutoProcessor.from_pretrained(BASE_PROCESSOR_NAME, **processor_kwargs)
     processor.tokenizer = tokenizer

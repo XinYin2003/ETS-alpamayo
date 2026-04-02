@@ -76,7 +76,7 @@ def load_physical_aiavdataset(
             avdi.features.CAMERA.CAMERA_FRONT_WIDE_120FOV,
             avdi.features.CAMERA.CAMERA_CROSS_RIGHT_120FOV,
             avdi.features.CAMERA.CAMERA_FRONT_TELE_30FOV,
-        ]
+        ]  #这里只有前向视角和左右斜视角，没有后向视角
 
     camera_name_to_index = {
         "camera_cross_left_120fov": 0,
